@@ -43,7 +43,7 @@ namespace GameRandomizer
             }
         }
 
-        public static Tuple<string, TypeEnum>? GetRandomItem(Pcg rand, Dictionary<string, TypeEnum> itemDict, List<string> items, List<string> usedItems, TypeEnum currentPowers)
+        public static string? GetRandomItem(Randomizer<TypeEnum> randomizer, Pcg rand, Dictionary<string, TypeEnum> itemDict, List<string> items, List<string> usedItems, TypeEnum currentPowers)
         {
             // Filter out the items that have already been used
             var unusedItems = itemDict.Where(item => items.Contains(item.Key)).ToList();
@@ -66,7 +66,12 @@ namespace GameRandomizer
             var selectedItemValue = Convert.ToInt64(randomItem.Value);
             var newValue = currentValue | selectedItemValue;
             currentPowers = (TypeEnum)Enum.ToObject(typeof(TypeEnum), newValue);
-            return Tuple.Create(randomItem.Key, currentPowers);
+            randomizer.SetCurrentPowers(currentPowers);
+            Utils.LogToFile($"=== Item Randomized ===", randomizer.GetLogPath());
+            Utils.LogToFile($"Name: {randomItem.Key}", randomizer.GetLogPath());
+            Utils.LogToFile($"Powers: {currentPowers.ToString()}", randomizer.GetLogPath());
+            Utils.LogToFile($"Current Powers: {randomizer.GetCurrentPowers().ToString()}", randomizer.GetLogPath());
+            return randomItem.Key;
         }
 
         public static List<string> GetItems(Dictionary<string, TypeEnum> itemsDict, List<string> usedItems, TypeEnum currentPowers)
